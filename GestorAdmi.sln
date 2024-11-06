@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminTICS", "AdminTICS\AdminTICS.csproj", "{671F8E7E-BD0E-41B8-928E-0787E4AAD47B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-Comun", "01-Comun", "{870B007C-27B0-43C0-AE87-A3BD98A760AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-Modelos", "02-Modelos", "{82E74424-6244-4C5B-8136-17828659C4DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03-Acceso a datos", "03-Acceso a datos", "{12A53215-F038-4308-A4E0-81E14F47EEDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04-Cliente Rest", "04-Cliente Rest", "{AADE2201-FE32-40D7-B835-8AC2D53F2FD5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05-Logica de Negocio", "05-Logica de Negocio", "{47B2106B-4231-41C3-A7CA-33F792011C84}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06-Web API", "06-Web API", "{B3B78372-FEDB-48A3-87F2-5C757306D0D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{671F8E7E-BD0E-41B8-928E-0787E4AAD47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{671F8E7E-BD0E-41B8-928E-0787E4AAD47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{671F8E7E-BD0E-41B8-928E-0787E4AAD47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{671F8E7E-BD0E-41B8-928E-0787E4AAD47B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B95329F0-A615-4BBD-9D8F-548FB8B431D9}
+	EndGlobalSection
+EndGlobal
