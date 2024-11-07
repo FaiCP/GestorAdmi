@@ -1,0 +1,468 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="control_activos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_equipo" Type="bigint" Nullable="false" />
+          <Property Name="fecha_auditoria" Type="date" />
+          <Property Name="detalles_auditoria" Type="varchar" MaxLength="255" />
+          <Property Name="custodio" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="departamentos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="nombre_empleado" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="gestion_activos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_equipo" Type="bigint" Nullable="false" />
+          <Property Name="asignado_a" Type="varchar" MaxLength="255" />
+          <Property Name="fecha_asignacion" Type="date" />
+          <Property Name="fecha_devolucion" Type="date" />
+          <Property Name="id_departamento" Type="bigint" />
+          <Property Name="custodio" Type="varchar" MaxLength="255" />
+          <Property Name="borrado" Type="bit" />
+        </EntityType>
+        <EntityType Name="gestion_hardware">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_equipo" Type="bigint" Nullable="false" />
+          <Property Name="descripcion" Type="varchar" MaxLength="255" />
+          <Property Name="marca" Type="varchar" MaxLength="255" />
+          <Property Name="modelo" Type="varchar" MaxLength="255" />
+          <Property Name="fecha_adquisicion" Type="date" />
+          <Property Name="estado" Type="varchar" MaxLength="50" />
+          <Property Name="ubicacion" Type="varchar" MaxLength="255" />
+          <Property Name="borrado" Type="bit" />
+        </EntityType>
+        <EntityType Name="historial_custodios">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="marca_temporal" Type="datetimeoffset" Precision="7" />
+          <Property Name="custodio" Type="varchar" MaxLength="255" />
+          <Property Name="id_departamento" Type="bigint" />
+        </EntityType>
+        <EntityType Name="historial_mantenimiento">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_equipo" Type="bigint" Nullable="false" />
+          <Property Name="fecha_mantenimiento" Type="date" />
+          <Property Name="detalles" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="suministros_remanufacturados">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_equipo" Type="bigint" />
+          <Property Name="tipo_suministro" Type="varchar" MaxLength="50" />
+          <Property Name="fecha_retiro" Type="date" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6035: La relación 'FK__control_a__id_eq__46E78A0C' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
+        <Association Name="FK__control_a__id_eq__46E78A0C" />-->
+        <Association Name="FK__gestion_a__id_de__440B1D61">
+          <End Role="departamentos" Type="Self.departamentos" Multiplicity="0..1" />
+          <End Role="gestion_activos" Type="Self.gestion_activos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="departamentos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="gestion_activos">
+              <PropertyRef Name="id_departamento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <!--Errores durante la generación:
+advertencia 6035: La relación 'FK__gestion_a__id_eq__4316F928' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
+        <Association Name="FK__gestion_a__id_eq__4316F928" />-->
+        <Association Name="FK__historial__id_de__4AB81AF0">
+          <End Role="departamentos" Type="Self.departamentos" Multiplicity="0..1" />
+          <End Role="historial_custodios" Type="Self.historial_custodios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="departamentos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="historial_custodios">
+              <PropertyRef Name="id_departamento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <!--Errores durante la generación:
+advertencia 6035: La relación 'FK__historial__id_eq__3A81B327' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
+        <Association Name="FK__historial__id_eq__3A81B327" />-->
+        <!--Errores durante la generación:
+advertencia 6035: La relación 'FK__suministr__id_eq__3D5E1FD2' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
+        <Association Name="FK__suministr__id_eq__3D5E1FD2" />-->
+        <Association Name="FK_Departamento">
+          <End Role="departamentos" Type="Self.departamentos" Multiplicity="0..1" />
+          <End Role="gestion_activos" Type="Self.gestion_activos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="departamentos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="gestion_activos">
+              <PropertyRef Name="id_departamento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ModelStoreContainer">
+          <EntitySet Name="control_activos" EntityType="Self.control_activos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="departamentos" EntityType="Self.departamentos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="gestion_activos" EntityType="Self.gestion_activos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="gestion_hardware" EntityType="Self.gestion_hardware" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="historial_custodios" EntityType="Self.historial_custodios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="historial_mantenimiento" EntityType="Self.historial_mantenimiento" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="suministros_remanufacturados" EntityType="Self.suministros_remanufacturados" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__gestion_a__id_de__440B1D61" Association="Self.FK__gestion_a__id_de__440B1D61">
+            <End Role="departamentos" EntitySet="departamentos" />
+            <End Role="gestion_activos" EntitySet="gestion_activos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__historial__id_de__4AB81AF0" Association="Self.FK__historial__id_de__4AB81AF0">
+            <End Role="departamentos" EntitySet="departamentos" />
+            <End Role="historial_custodios" EntitySet="historial_custodios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Departamento" Association="Self.FK_Departamento">
+            <End Role="departamentos" EntitySet="departamentos" />
+            <End Role="gestion_activos" EntitySet="gestion_activos" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="DbConext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="control_activos" EntityType="Model.control_activos" />
+          <EntitySet Name="departamentos" EntityType="Model.departamentos" />
+          <EntitySet Name="gestion_activos" EntityType="Model.gestion_activos" />
+          <EntitySet Name="gestion_hardware" EntityType="Model.gestion_hardware" />
+          <EntitySet Name="historial_custodios" EntityType="Model.historial_custodios" />
+          <EntitySet Name="historial_mantenimiento" EntityType="Model.historial_mantenimiento" />
+          <EntitySet Name="suministros_remanufacturados" EntityType="Model.suministros_remanufacturados" />
+          <AssociationSet Name="FK__control_a__id_eq__6A30C649" Association="Model.FK__control_a__id_eq__6A30C649">
+            <End Role="gestion_hardware" EntitySet="gestion_hardware" />
+            <End Role="control_activos" EntitySet="control_activos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__gestion_a__id_de__6754599E" Association="Model.FK__gestion_a__id_de__6754599E">
+            <End Role="departamentos" EntitySet="departamentos" />
+            <End Role="gestion_activos" EntitySet="gestion_activos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__historial__id_de__6E01572D" Association="Model.FK__historial__id_de__6E01572D">
+            <End Role="departamentos" EntitySet="departamentos" />
+            <End Role="historial_custodios" EntitySet="historial_custodios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Departamento" Association="Model.FK_Departamento">
+            <End Role="departamentos" EntitySet="departamentos" />
+            <End Role="gestion_activos" EntitySet="gestion_activos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__gestion_a__id_eq__66603565" Association="Model.FK__gestion_a__id_eq__66603565">
+            <End Role="gestion_hardware" EntitySet="gestion_hardware" />
+            <End Role="gestion_activos" EntitySet="gestion_activos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__historial__id_eq__5DCAEF64" Association="Model.FK__historial__id_eq__5DCAEF64">
+            <End Role="gestion_hardware" EntitySet="gestion_hardware" />
+            <End Role="historial_mantenimiento" EntitySet="historial_mantenimiento" />
+          </AssociationSet>
+          <AssociationSet Name="FK__suministr__id_eq__60A75C0F" Association="Model.FK__suministr__id_eq__60A75C0F">
+            <End Role="gestion_hardware" EntitySet="gestion_hardware" />
+            <End Role="suministros_remanufacturados" EntitySet="suministros_remanufacturados" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="control_activos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_equipo" Type="Int64" Nullable="false" />
+          <Property Name="fecha_auditoria" Type="DateTime" Precision="0" />
+          <Property Name="detalles_auditoria" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="custodio" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="gestion_hardware" Relationship="Model.FK__control_a__id_eq__6A30C649" FromRole="control_activos" ToRole="gestion_hardware" />
+        </EntityType>
+        <EntityType Name="departamentos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="nombre_empleado" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="gestion_activos" Relationship="Model.FK__gestion_a__id_de__6754599E" FromRole="departamentos" ToRole="gestion_activos" />
+          <NavigationProperty Name="historial_custodios" Relationship="Model.FK__historial__id_de__6E01572D" FromRole="departamentos" ToRole="historial_custodios" />
+          <NavigationProperty Name="gestion_activos1" Relationship="Model.FK_Departamento" FromRole="departamentos" ToRole="gestion_activos" />
+        </EntityType>
+        <EntityType Name="gestion_activos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_equipo" Type="Int64" Nullable="false" />
+          <Property Name="asignado_a" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="fecha_asignacion" Type="DateTime" Precision="0" />
+          <Property Name="fecha_devolucion" Type="DateTime" Precision="0" />
+          <Property Name="id_departamento" Type="Int64" />
+          <Property Name="custodio" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="departamentos" Relationship="Model.FK__gestion_a__id_de__6754599E" FromRole="gestion_activos" ToRole="departamentos" />
+          <NavigationProperty Name="departamentos1" Relationship="Model.FK_Departamento" FromRole="gestion_activos" ToRole="departamentos" />
+          <NavigationProperty Name="gestion_hardware" Relationship="Model.FK__gestion_a__id_eq__66603565" FromRole="gestion_activos" ToRole="gestion_hardware" />
+          <Property Name="borrado" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="gestion_hardware">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_equipo" Type="Int64" Nullable="false" />
+          <Property Name="descripcion" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="marca" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="modelo" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="fecha_adquisicion" Type="DateTime" Precision="0" />
+          <Property Name="estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ubicacion" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="control_activos" Relationship="Model.FK__control_a__id_eq__6A30C649" FromRole="gestion_hardware" ToRole="control_activos" />
+          <NavigationProperty Name="gestion_activos" Relationship="Model.FK__gestion_a__id_eq__66603565" FromRole="gestion_hardware" ToRole="gestion_activos" />
+          <NavigationProperty Name="historial_mantenimiento" Relationship="Model.FK__historial__id_eq__5DCAEF64" FromRole="gestion_hardware" ToRole="historial_mantenimiento" />
+          <NavigationProperty Name="suministros_remanufacturados" Relationship="Model.FK__suministr__id_eq__60A75C0F" FromRole="gestion_hardware" ToRole="suministros_remanufacturados" />
+          <Property Name="borrado" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="historial_custodios">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="marca_temporal" Type="DateTimeOffset" Precision="7" />
+          <Property Name="custodio" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="id_departamento" Type="Int64" />
+          <NavigationProperty Name="departamentos" Relationship="Model.FK__historial__id_de__6E01572D" FromRole="historial_custodios" ToRole="departamentos" />
+        </EntityType>
+        <EntityType Name="historial_mantenimiento">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_equipo" Type="Int64" Nullable="false" />
+          <Property Name="fecha_mantenimiento" Type="DateTime" Precision="0" />
+          <Property Name="detalles" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="gestion_hardware" Relationship="Model.FK__historial__id_eq__5DCAEF64" FromRole="historial_mantenimiento" ToRole="gestion_hardware" />
+        </EntityType>
+        <EntityType Name="suministros_remanufacturados">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_equipo" Type="Int64" />
+          <Property Name="tipo_suministro" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="fecha_retiro" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="gestion_hardware" Relationship="Model.FK__suministr__id_eq__60A75C0F" FromRole="suministros_remanufacturados" ToRole="gestion_hardware" />
+        </EntityType>
+        <Association Name="FK__control_a__id_eq__6A30C649">
+          <End Type="Model.gestion_hardware" Role="gestion_hardware" Multiplicity="1" />
+          <End Type="Model.control_activos" Role="control_activos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="gestion_hardware">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="control_activos">
+              <PropertyRef Name="id_equipo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__gestion_a__id_de__6754599E">
+          <End Type="Model.departamentos" Role="departamentos" Multiplicity="0..1" />
+          <End Type="Model.gestion_activos" Role="gestion_activos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="departamentos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="gestion_activos">
+              <PropertyRef Name="id_departamento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__historial__id_de__6E01572D">
+          <End Type="Model.departamentos" Role="departamentos" Multiplicity="0..1" />
+          <End Type="Model.historial_custodios" Role="historial_custodios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="departamentos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="historial_custodios">
+              <PropertyRef Name="id_departamento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Departamento">
+          <End Type="Model.departamentos" Role="departamentos" Multiplicity="0..1" />
+          <End Type="Model.gestion_activos" Role="gestion_activos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="departamentos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="gestion_activos">
+              <PropertyRef Name="id_departamento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__gestion_a__id_eq__66603565">
+          <End Type="Model.gestion_hardware" Role="gestion_hardware" Multiplicity="1" />
+          <End Type="Model.gestion_activos" Role="gestion_activos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="gestion_hardware">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="gestion_activos">
+              <PropertyRef Name="id_equipo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__historial__id_eq__5DCAEF64">
+          <End Type="Model.gestion_hardware" Role="gestion_hardware" Multiplicity="1" />
+          <End Type="Model.historial_mantenimiento" Role="historial_mantenimiento" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="gestion_hardware">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="historial_mantenimiento">
+              <PropertyRef Name="id_equipo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__suministr__id_eq__60A75C0F">
+          <End Type="Model.gestion_hardware" Role="gestion_hardware" Multiplicity="0..1" />
+          <End Type="Model.suministros_remanufacturados" Role="suministros_remanufacturados" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="gestion_hardware">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="suministros_remanufacturados">
+              <PropertyRef Name="id_equipo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="DbConext">
+          <EntitySetMapping Name="control_activos">
+            <EntityTypeMapping TypeName="Model.control_activos">
+              <MappingFragment StoreEntitySet="control_activos">
+                <ScalarProperty Name="custodio" ColumnName="custodio" />
+                <ScalarProperty Name="detalles_auditoria" ColumnName="detalles_auditoria" />
+                <ScalarProperty Name="fecha_auditoria" ColumnName="fecha_auditoria" />
+                <ScalarProperty Name="id_equipo" ColumnName="id_equipo" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="departamentos">
+            <EntityTypeMapping TypeName="Model.departamentos">
+              <MappingFragment StoreEntitySet="departamentos">
+                <ScalarProperty Name="nombre_empleado" ColumnName="nombre_empleado" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="gestion_activos">
+            <EntityTypeMapping TypeName="Model.gestion_activos">
+              <MappingFragment StoreEntitySet="gestion_activos">
+                <ScalarProperty Name="borrado" ColumnName="borrado" />
+                <ScalarProperty Name="custodio" ColumnName="custodio" />
+                <ScalarProperty Name="id_departamento" ColumnName="id_departamento" />
+                <ScalarProperty Name="fecha_devolucion" ColumnName="fecha_devolucion" />
+                <ScalarProperty Name="fecha_asignacion" ColumnName="fecha_asignacion" />
+                <ScalarProperty Name="asignado_a" ColumnName="asignado_a" />
+                <ScalarProperty Name="id_equipo" ColumnName="id_equipo" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="gestion_hardware">
+            <EntityTypeMapping TypeName="Model.gestion_hardware">
+              <MappingFragment StoreEntitySet="gestion_hardware">
+                <ScalarProperty Name="borrado" ColumnName="borrado" />
+                <ScalarProperty Name="ubicacion" ColumnName="ubicacion" />
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="fecha_adquisicion" ColumnName="fecha_adquisicion" />
+                <ScalarProperty Name="modelo" ColumnName="modelo" />
+                <ScalarProperty Name="marca" ColumnName="marca" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+                <ScalarProperty Name="id_equipo" ColumnName="id_equipo" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="historial_custodios">
+            <EntityTypeMapping TypeName="Model.historial_custodios">
+              <MappingFragment StoreEntitySet="historial_custodios">
+                <ScalarProperty Name="id_departamento" ColumnName="id_departamento" />
+                <ScalarProperty Name="custodio" ColumnName="custodio" />
+                <ScalarProperty Name="marca_temporal" ColumnName="marca_temporal" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="historial_mantenimiento">
+            <EntityTypeMapping TypeName="Model.historial_mantenimiento">
+              <MappingFragment StoreEntitySet="historial_mantenimiento">
+                <ScalarProperty Name="detalles" ColumnName="detalles" />
+                <ScalarProperty Name="fecha_mantenimiento" ColumnName="fecha_mantenimiento" />
+                <ScalarProperty Name="id_equipo" ColumnName="id_equipo" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="suministros_remanufacturados">
+            <EntityTypeMapping TypeName="Model.suministros_remanufacturados">
+              <MappingFragment StoreEntitySet="suministros_remanufacturados">
+                <ScalarProperty Name="fecha_retiro" ColumnName="fecha_retiro" />
+                <ScalarProperty Name="tipo_suministro" ColumnName="tipo_suministro" />
+                <ScalarProperty Name="id_equipo" ColumnName="id_equipo" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
