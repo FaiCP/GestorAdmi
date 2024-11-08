@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Modelo.Modelos
 {
-    public partial class DbConexion : DbConext
+    public partial class DbConexion : DbContext
     {
         private DbConexion(string stringConexion)
             : base(stringConexion)
@@ -20,7 +20,7 @@ namespace Modelo.Modelos
 
         public static DbConexion Create()
         {
-            return new DbConexion("name=DbConexion");
+            return new DbConexion("name=DbConext");
         }
         
     }
