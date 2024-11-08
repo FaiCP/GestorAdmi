@@ -15,7 +15,7 @@ namespace Modelo.Modelo
     
     public partial class DbConext : DbContext
     {
-        public DbConext(string stringConexion)
+        public DbConext()
             : base("name=DbConext")
         {
         }
@@ -32,5 +32,6 @@ namespace Modelo.Modelo
         public virtual DbSet<historial_custodios> historial_custodios { get; set; }
         public virtual DbSet<historial_mantenimiento> historial_mantenimiento { get; set; }
         public virtual DbSet<suministros_remanufacturados> suministros_remanufacturados { get; set; }
+        public virtual DbSet<computer_characteristics> computer_characteristics { get; set; }
     }
 }

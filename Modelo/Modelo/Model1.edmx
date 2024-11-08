@@ -5,6 +5,18 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="computer_characteristics">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_dispositivo" Type="bigint" />
+          <Property Name="ram" Type="nvarchar" MaxLength="255" />
+          <Property Name="rom" Type="nvarchar" MaxLength="255" />
+          <Property Name="codigo_cne" Type="nvarchar" MaxLength="255" />
+          <Property Name="nombre_dispositivo" Type="nvarchar" MaxLength="255" />
+          <Property Name="procesador" Type="nvarchar" MaxLength="255" />
+        </EntityType>
         <EntityType Name="control_activos">
           <Key>
             <PropertyRef Name="id" />
@@ -113,6 +125,9 @@ advertencia 6035: La relación 'FK__historial__id_eq__3A81B327' tiene columnas q
         <!--Errores durante la generación:
 advertencia 6035: La relación 'FK__suministr__id_eq__3D5E1FD2' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
         <Association Name="FK__suministr__id_eq__3D5E1FD2" />-->
+        <!--Errores durante la generación:
+advertencia 6035: La relación 'FK_ComputerCharacteristics_GestionHardware' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
+        <Association Name="FK_ComputerCharacteristics_GestionHardware" />-->
         <Association Name="FK_Departamento">
           <End Role="departamentos" Type="Self.departamentos" Multiplicity="0..1" />
           <End Role="gestion_activos" Type="Self.gestion_activos" Multiplicity="*" />
@@ -125,7 +140,11 @@ advertencia 6035: La relación 'FK__suministr__id_eq__3D5E1FD2' tiene columnas q
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <!--Errores durante la generación:
+advertencia 6035: La relación 'ip_dispositivo' tiene columnas que no forman parte de la clave de la tabla en el lado principal de la relación. Se excluyó la relación.
+        <Association Name="ip_dispositivo" />-->
         <EntityContainer Name="ModelStoreContainer">
+          <EntitySet Name="computer_characteristics" EntityType="Self.computer_characteristics" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="control_activos" EntityType="Self.control_activos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="departamentos" EntityType="Self.departamentos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="gestion_activos" EntityType="Self.gestion_activos" Schema="dbo" store:Type="Tables" />
@@ -186,6 +205,7 @@ advertencia 6035: La relación 'FK__suministr__id_eq__3D5E1FD2' tiene columnas q
             <End Role="gestion_hardware" EntitySet="gestion_hardware" />
             <End Role="suministros_remanufacturados" EntitySet="suministros_remanufacturados" />
           </AssociationSet>
+          <EntitySet Name="computer_characteristics" EntityType="Model.computer_characteristics" />
         </EntityContainer>
         <EntityType Name="control_activos">
           <Key>
@@ -357,6 +377,18 @@ advertencia 6035: La relación 'FK__suministr__id_eq__3D5E1FD2' tiene columnas q
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="computer_characteristics">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_dispositivo" Type="Int64" />
+          <Property Name="ram" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="rom" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="codigo_cne" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="nombre_dispositivo" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="procesador" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -438,6 +470,19 @@ advertencia 6035: La relación 'FK__suministr__id_eq__3D5E1FD2' tiene columnas q
                 <ScalarProperty Name="fecha_retiro" ColumnName="fecha_retiro" />
                 <ScalarProperty Name="tipo_suministro" ColumnName="tipo_suministro" />
                 <ScalarProperty Name="id_equipo" ColumnName="id_equipo" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="computer_characteristics">
+            <EntityTypeMapping TypeName="Model.computer_characteristics">
+              <MappingFragment StoreEntitySet="computer_characteristics">
+                <ScalarProperty Name="procesador" ColumnName="procesador" />
+                <ScalarProperty Name="nombre_dispositivo" ColumnName="nombre_dispositivo" />
+                <ScalarProperty Name="codigo_cne" ColumnName="codigo_cne" />
+                <ScalarProperty Name="rom" ColumnName="rom" />
+                <ScalarProperty Name="ram" ColumnName="ram" />
+                <ScalarProperty Name="id_dispositivo" ColumnName="id_dispositivo" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

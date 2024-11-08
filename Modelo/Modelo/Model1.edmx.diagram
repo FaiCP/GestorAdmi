@@ -5,13 +5,13 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="05f18b28709849cd9b349e0390f25a9e" Name="Diagram1">
-        <EntityTypeShape EntityType="Model.control_activos" Width="1.5" PointX="3" PointY="4" />
-        <EntityTypeShape EntityType="Model.departamentos" Width="1.5" PointX="3.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Model.gestion_activos" Width="1.5" PointX="6" PointY="6.375" />
-        <EntityTypeShape EntityType="Model.gestion_hardware" Width="1.5" PointX="0.75" PointY="6.125" />
-        <EntityTypeShape EntityType="Model.historial_custodios" Width="1.5" PointX="6" PointY="3.625" />
-        <EntityTypeShape EntityType="Model.historial_mantenimiento" Width="1.5" PointX="3" PointY="10.625" />
-        <EntityTypeShape EntityType="Model.suministros_remanufacturados" Width="1.5" PointX="3" PointY="13.375" />
+        <EntityTypeShape EntityType="Model.control_activos" Width="1.5" PointX="3" PointY="10.5" />
+        <EntityTypeShape EntityType="Model.departamentos" Width="1.5" PointX="6.5" PointY="6.625" />
+        <EntityTypeShape EntityType="Model.gestion_activos" Width="1.5" PointX="8.75" PointY="7.875" />
+        <EntityTypeShape EntityType="Model.gestion_hardware" Width="1.625" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="Model.historial_custodios" Width="1.5" PointX="8.75" PointY="5" />
+        <EntityTypeShape EntityType="Model.historial_mantenimiento" Width="1.5" PointX="3" PointY="7.375" />
+        <EntityTypeShape EntityType="Model.suministros_remanufacturados" Width="2" PointX="0.875" PointY="4.375" />
         <AssociationConnector Association="Model.FK__control_a__id_eq__6A30C649" />
         <AssociationConnector Association="Model.FK__gestion_a__id_de__6754599E" />
         <AssociationConnector Association="Model.FK__historial__id_de__6E01572D" />
@@ -19,6 +19,7 @@
         <AssociationConnector Association="Model.FK__gestion_a__id_eq__66603565" />
         <AssociationConnector Association="Model.FK__historial__id_eq__5DCAEF64" />
         <AssociationConnector Association="Model.FK__suministr__id_eq__60A75C0F" />
+        <EntityTypeShape EntityType="Model.computer_characteristics" Width="1.5" PointX="4.75" PointY="2.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
