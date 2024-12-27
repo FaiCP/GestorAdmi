@@ -17,28 +17,32 @@ namespace Modelo.Modelo
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public gestion_hardware()
         {
+            this.caracteristicas_computadora = new HashSet<caracteristicas_computadora>();
             this.control_activos = new HashSet<control_activos>();
             this.gestion_activos = new HashSet<gestion_activos>();
-            this.historial_mantenimiento = new HashSet<historial_mantenimiento>();
             this.suministros_remanufacturados = new HashSet<suministros_remanufacturados>();
         }
     
         public long id { get; set; }
-        public long id_equipo { get; set; }
-        public string descripcion { get; set; }
+        public string id_equipo { get; set; }
         public string marca { get; set; }
         public string modelo { get; set; }
         public Nullable<System.DateTime> fecha_adquisicion { get; set; }
         public string estado { get; set; }
         public string ubicacion { get; set; }
         public Nullable<bool> borrado { get; set; }
+        public string codigo_cne { get; set; }
+        public string nombre_dispositivo { get; set; }
+        public Nullable<long> id_suministro { get; set; }
+        public string observacion { get; set; }
+        public Nullable<decimal> valor { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<caracteristicas_computadora> caracteristicas_computadora { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<control_activos> control_activos { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<gestion_activos> gestion_activos { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<historial_mantenimiento> historial_mantenimiento { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<suministros_remanufacturados> suministros_remanufacturados { get; set; }
     }

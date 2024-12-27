@@ -15,9 +15,11 @@ namespace Modelo.Modelo
     public partial class suministros_remanufacturados
     {
         public long id { get; set; }
-        public Nullable<long> id_equipo { get; set; }
+        public string id_equipo { get; set; }
         public string tipo_suministro { get; set; }
         public Nullable<System.DateTime> fecha_retiro { get; set; }
+        public string id_equipoAsignado { get; set; }
+        public bool borrado { get; set; }
     
         public virtual gestion_hardware gestion_hardware { get; set; }
     }

@@ -13,10 +13,10 @@ namespace Modelo.Modelo
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class DbConext : DbContext
+    public partial class TICSADMIEntities1 : DbContext
     {
-        public DbConext()
-            : base("name=DbConext")
+        public TICSADMIEntities1()
+            : base("name=TICSADMIEntities1")
         {
         }
     
@@ -26,12 +26,16 @@ namespace Modelo.Modelo
         }
     
         public virtual DbSet<control_activos> control_activos { get; set; }
+        public virtual DbSet<historial_mantenimiento> historial_mantenimiento { get; set; }
+        public virtual DbSet<Usuarios> Usuarios { get; set; }
+        public virtual DbSet<caracteristicas_computadora> caracteristicas_computadora { get; set; }
+        public virtual DbSet<Custodios> Custodios { get; set; }
         public virtual DbSet<departamentos> departamentos { get; set; }
         public virtual DbSet<gestion_activos> gestion_activos { get; set; }
         public virtual DbSet<gestion_hardware> gestion_hardware { get; set; }
-        public virtual DbSet<historial_custodios> historial_custodios { get; set; }
-        public virtual DbSet<historial_mantenimiento> historial_mantenimiento { get; set; }
         public virtual DbSet<suministros_remanufacturados> suministros_remanufacturados { get; set; }
-        public virtual DbSet<computer_characteristics> computer_characteristics { get; set; }
+        public virtual DbSet<Personal> Personal { get; set; }
+        public virtual DbSet<historial_custodios> historial_custodios { get; set; }
+        public virtual DbSet<Kits> Kits { get; set; }
     }
 }

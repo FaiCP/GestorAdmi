@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.9\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
       <HintPath>..\packages\BouncyCastle.Cryptography.2.2.1\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
     </Reference>
@@ -39,6 +42,9 @@
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.3.3.11, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.3.3\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.3, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.3\lib\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="LogicExtensions, Version=0.0.3.0, Culture=neutral, PublicKeyToken=7dc32d555748676e, processorArchitecture=MSIL">
       <HintPath>..\packages\LogicExtensions.0.0.3\lib\netstandard2.0\LogicExtensions.dll</HintPath>
@@ -110,14 +116,36 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\ActasMVR.cs" />
+    <Compile Include="ViewModels\CaracteristicasHarrdwareVMR.cs" />
+    <Compile Include="ViewModels\CustodioVMR.cs" />
+    <Compile Include="ViewModels\DepartamentosVMR.cs" />
+    <Compile Include="ViewModels\EncabezadoPersonalVMR.cs" />
+    <Compile Include="ViewModels\EncabezadosVMR.cs" />
+    <Compile Include="ViewModels\EntradaActivosVMR.cs" />
     <Compile Include="ViewModels\GestionActivosVMR.cs" />
     <Compile Include="ViewModels\HaedwareVMR.cs" />
+    <Compile Include="ViewModels\HardwareCaracterVMR.cs" />
+    <Compile Include="ViewModels\HistorialPrestamosVMR.cs" />
+    <Compile Include="ViewModels\KitsVMR.cs" />
     <Compile Include="ViewModels\ListadoPaginadoVMR.cs" />
+    <Compile Include="ViewModels\LoginVMR.cs" />
+    <Compile Include="ViewModels\PersonalVMR.cs" />
     <Compile Include="ViewModels\RespuestasVMR.cs" />
+    <Compile Include="ViewModels\SuministrosVMR.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Modelo\Modelos.csproj">
+      <Project>{8bec00e1-bb08-4cef-8829-692d117c508f}</Project>
+      <Name>Modelos</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

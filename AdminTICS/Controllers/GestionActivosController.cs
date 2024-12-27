@@ -1,5 +1,6 @@
 ﻿using Comun.ViewModels;
 using Logica.BLL;
+using Microsoft.AspNetCore.Mvc;
 using Modelo.Modelo;
 using Modelo.Modelos;
 using System;
@@ -11,19 +12,23 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 
 
+
 namespace AdminTICS.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
+    [RoutePrefix("api/GestionActivos")]
     public class GestionActivosController : ApiController
     {
+
         [HttpGet]
-        public IHttpActionResult LeerTodo(int cantidad = 10, int pagina = 0, string textoBusqueda = null)
+        [Route("LeerTodo")]
+        public IHttpActionResult LeerTodo(int cantidad , int pagina , string busqueda)
         {
             var respuesta = new RespuestasVMR<ListadoPaginadoVMR<GestionActivosVMR>>();
 
             try
             {
-                respuesta.datos = GestionActivosBLL.LeerTodo(cantidad, pagina, textoBusqueda);
+                respuesta.datos = GestionActivosBLL.LeerTodo(cantidad, pagina, busqueda);
             }
             catch (Exception ex)
             {
@@ -34,30 +39,96 @@ namespace AdminTICS.Controllers
             }
 
             return Content(respuesta.codigo, respuesta);
+        }
+
+        [HttpGet]
+        [Route("GenerarActa/{ids}")]
+        public HttpResponseMessage GenerarActa(string ids)
+        {
+            try
+            {
+                var idList = ids.Split(',').Select(long.Parse).ToList();
+                byte[] pdfBytes = GestionActivosBLL.GenerarActaPDF(idList);
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(pdfBytes)
+                };
+
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+                response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = $"Acta_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent($"Error al generar el acta: {ex.Message}")
+                };
+            }
+        }
+
+        [HttpGet]
+        [Route("GenerarDevolucionPDF/{ids}")]
+        public HttpResponseMessage GenerarDevolucionPDF(string ids)
+        {
+            try
+            {
+                var idList = ids.Split(',').Select(long.Parse).ToList();
+                byte[] pdfBytes = GestionActivosBLL.GenerarDevolucionPDF(idList);
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(pdfBytes)
+                };
+
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+                response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = $"Acta_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent($"Error al generar el acta: {ex.Message}")
+                };
+            }
         }
 
         [HttpPost]
-        public IHttpActionResult Crear(gestion_activos item)
+        [Route("Crear")]
+        public IHttpActionResult Crear(List<gestion_activos> items)
         {
-            var respuesta = new RespuestasVMR<long?>();
+            var respuesta = new RespuestasVMR<List<long?>>();
 
             try
             {
-                respuesta.datos = GestionActivosBLL.Crear(item);
+                respuesta.datos = GestionActivosBLL.Crear(items);
+                respuesta.codigo = HttpStatusCode.OK;
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                respuesta.codigo = HttpStatusCode.InternalServerError;
+                respuesta.codigo = HttpStatusCode.BadRequest; 
                 respuesta.datos = null;
                 respuesta.mensajesErrors.Add(ex.Message);
-                respuesta.mensajesErrors.Add(ex.ToString());
+                //respuesta.mensajesErrors.Add(ex.ToString());
             }
 
-            return Content(respuesta.codigo, respuesta);
 
+            return Content(respuesta.codigo, respuesta);
         }
 
+
         [HttpPut]
+        [Route("Actualizar/{id}")]
         public IHttpActionResult Actualizar(long id, GestionActivosVMR item)
         {
             var respuesta = new RespuestasVMR<bool>();
@@ -80,7 +151,8 @@ namespace AdminTICS.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(List<long> ids)
+        [Route("Eliminar/{ids}")]
+        public IHttpActionResult Eliminar([FromUri] List<long> ids)
         {
             var respuesta = new RespuestasVMR<bool>();
 

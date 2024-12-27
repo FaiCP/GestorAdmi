@@ -15,7 +15,7 @@ namespace Modelo.Modelo
     public partial class control_activos
     {
         public long id { get; set; }
-        public long id_equipo { get; set; }
+        public string id_equipo { get; set; }
         public Nullable<System.DateTime> fecha_auditoria { get; set; }
         public string detalles_auditoria { get; set; }
         public string custodio { get; set; }

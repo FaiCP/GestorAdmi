@@ -12,14 +12,25 @@ namespace Logica.BLL
 {
     public class GestionActivosBLL
     {
-        public static ListadoPaginadoVMR<GestionActivosVMR> LeerTodo(int cantidad, int pagina, string textoBusqueda)
+        public static ListadoPaginadoVMR<GestionActivosVMR> LeerTodo(int cantidad, int pagina, string busqueda)
         {
-            return GestionActuvosDAL.LeerTodo(cantidad, pagina, textoBusqueda);
+            return GestionActuvosDAL.LeerTodo(cantidad, pagina, busqueda);
         }
-        public static long Crear(gestion_activos item)
+        public static byte[] GenerarActaPDF(List<long> id )
         {
-            return GestionActuvosDAL.Crear(item);
+            return GestionActuvosDAL.GenerarActaPDF(id);
         }
+
+        public static byte[] GenerarDevolucionPDF(List<long> id)
+        {
+            return GestionActuvosDAL.GenerarDevolucionPDF(id);
+        }
+
+        public static List<long?> Crear(List<gestion_activos> items)
+        {
+            return GestionActuvosDAL.Crear(items);
+        }
+
         public static void Actualizar(GestionActivosVMR item)
         {
             GestionActuvosDAL.Actualizar(item);
