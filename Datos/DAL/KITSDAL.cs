@@ -59,12 +59,13 @@ namespace Datos.DAL
             return resultado;
         }
 
-        public static long Crear(Kits nuevoItem)
+        public static long Crear(KitsVMR nuevoItem)
         {
             using (var db = DbConexion.Create())
             {
                 var KITS = new Kits
                 {
+                    id= nuevoItem.id,
                     Serie = nuevoItem.Serie,
                     OBSERVACION = nuevoItem.OBSERVACION,
                     CANTIDAD = nuevoItem.CANTIDAD,
@@ -114,6 +115,103 @@ namespace Datos.DAL
             }
         }
 
-        
+        public static List<KitsVMR> ObtenerKits()
+        {
+            using (var db = DbConexion.Create())
+            {
+                var equipos = (from gh in db.Kits                               
+                               select new KitsVMR
+                               {
+                                   id = gh.id,
+                                   CANTIDAD = gh.CANTIDAD,
+                                   ESTADO = gh.ESTADO,
+                                   INSUMO = gh.INSUMO,
+                                   MARCA = gh.MARCA,
+                                   MODELO = gh.MODELO,
+                                   OBSERVACION = gh.OBSERVACION,
+                                   Serie = gh.Serie,
+                                   
+
+                               }).ToList();
+
+                return equipos;
+            }
+        }
+
+        public static byte[] GenerarActaPDF()
+        {
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    var equiposInfo = ObtenerKits();
+                    Document document = new Document(PageSize.A4, 36, 36, 100, 100);
+                    PdfWriter writer = PdfWriter.GetInstance(document, stream);
+                    writer.PageEvent = new EncabezadosVMR();
+                    document.Open();
+
+                    var equipoSeleccionado = equiposInfo.FirstOrDefault();
+
+                    if (equipoSeleccionado == null)
+                    {
+                        throw new Exception("No se encontró ningún equipo para generar el acta.");
+                    }
+
+                    // Título del Acta
+
+                    Paragraph tituloActa = new Paragraph("Informe de Inventarios\n\n", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD))
+                    {
+                        Alignment = Element.ALIGN_CENTER
+                    };
+
+                    document.Add(tituloActa);
+
+
+                    // Crear una fuente con tamaño 10
+                    Font font = new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL);
+
+                    // Tabla de Detalle del Equipo
+                    PdfPTable table = new PdfPTable(8);
+                    table.WidthPercentage = 100;
+                    table.SetWidths(new float[] { 0.5f, 1.4f, 2, 2, 1.5f, 2, 2, 1.4f });
+
+                    // Encabezados (aplicar fuente a los encabezados)
+                    table.AddCell(new PdfPCell(new Phrase("Nº", font)));
+                    table.AddCell(new PdfPCell(new Phrase("INSUMO", font)));
+                    table.AddCell(new PdfPCell(new Phrase("MARCA", font)));
+                    table.AddCell(new PdfPCell(new Phrase("MODELO", font)));
+                    table.AddCell(new PdfPCell(new Phrase("Serie", font)));
+                    table.AddCell(new PdfPCell(new Phrase("CANTIDAD", font)));
+                    table.AddCell(new PdfPCell(new Phrase("ESTADO", font)));
+                    table.AddCell(new PdfPCell(new Phrase("OBSERVACION", font)));
+
+                    // Agregar los datos de los equipos (también con la misma fuente)
+                    int contador = 1;
+                    foreach (var equipo in equiposInfo)
+                    {
+                        table.AddCell(new PdfPCell(new Phrase(contador.ToString(), font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.INSUMO, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.MARCA, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.MODELO, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.Serie, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.CANTIDAD, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.ESTADO, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.OBSERVACION, font)));
+                        contador++;
+                    }
+
+                    document.Add(table);
+
+
+                    document.Close();
+
+                    return stream.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al generar el acta en PDF", ex);
+            }
+        }
     }
 }

@@ -14,5 +14,17 @@ namespace Logica.BLL
         {
             return KITSDAL.LeerTodo(cantidad, pagina, textoBusqueda);
         }
+        public static long Crear(KitsVMR item)
+        {
+            return KITSDAL.Crear(item);
+        }
+        public static void Actualizar(KitsVMR item)
+        {
+            KITSDAL.Actualizar(item);
+        }
+        public static byte[] GenerarActaPDF()
+        {
+            return KITSDAL.GenerarActaPDF();
+        }
     }
 }
