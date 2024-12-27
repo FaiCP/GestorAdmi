@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Datos.DAL.HardwareDAL;
 
 namespace Logica.BLL
 {
@@ -16,7 +17,15 @@ namespace Logica.BLL
         {
             return HardwareDAL.LeerTodo(cantidad, pagina, textoBusqueda);
         }
-        public static long Crear(gestion_hardware item)
+        public static byte[] GenerarActaPDF()
+        {
+            return HardwareDAL.GenerarActaPDF();
+        }
+        public static byte[] GenerarActaExcel()
+        {
+            return HardwareDAL.GenerarActaExcel();
+        }
+        public static long Crear(HardwareCaracterVMR item)
         {
             return HardwareDAL.Crear(item);
         }

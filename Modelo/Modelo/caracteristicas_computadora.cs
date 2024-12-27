@@ -12,14 +12,14 @@ namespace Modelo.Modelo
     using System;
     using System.Collections.Generic;
     
-    public partial class computer_characteristics
+    public partial class caracteristicas_computadora
     {
         public long id { get; set; }
-        public Nullable<long> id_dispositivo { get; set; }
+        public string id_equipo { get; set; }
         public string ram { get; set; }
         public string rom { get; set; }
-        public string codigo_cne { get; set; }
-        public string nombre_dispositivo { get; set; }
         public string procesador { get; set; }
+    
+        public virtual gestion_hardware gestion_hardware { get; set; }
     }
 }

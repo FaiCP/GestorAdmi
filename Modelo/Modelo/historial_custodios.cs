@@ -15,10 +15,8 @@ namespace Modelo.Modelo
     public partial class historial_custodios
     {
         public long id { get; set; }
-        public Nullable<System.DateTimeOffset> marca_temporal { get; set; }
+        public Nullable<System.DateTime> timestamp_evento { get; set; }
         public string custodio { get; set; }
         public Nullable<long> id_departamento { get; set; }
-    
-        public virtual departamentos departamentos { get; set; }
     }
 }

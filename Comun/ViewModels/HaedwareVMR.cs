@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.RootFinding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,5 +17,12 @@ namespace Comun.ViewModels
         public Nullable<System.DateTime> fecha_adquisicion { get; set; }
         public string estado { get; set; }
         public string ubicacion { get; set; }
+        public string codigo_cne { get; set; }
+        public Nullable<bool> borrado { get; set; }
+        public string nombre_dispositivo { get; set; }
+        public Nullable<decimal> valor { get; set; }
+        public string NombreCustodio { get; set; }
+        public string Departamento { get; set; }
+        public string NombreCustodio1 { get; set; }
     }
 }

@@ -15,16 +15,13 @@ namespace Modelo.Modelo
     public partial class gestion_activos
     {
         public long id { get; set; }
-        public long id_equipo { get; set; }
-        public string asignado_a { get; set; }
+        public string id_equipo { get; set; }
+        public long id_custodio { get; set; }
         public Nullable<System.DateTime> fecha_asignacion { get; set; }
         public Nullable<System.DateTime> fecha_devolucion { get; set; }
-        public Nullable<long> id_departamento { get; set; }
-        public string custodio { get; set; }
         public Nullable<bool> borrado { get; set; }
     
-        public virtual departamentos departamentos { get; set; }
-        public virtual departamentos departamentos1 { get; set; }
+        public virtual Custodios Custodios { get; set; }
         public virtual gestion_hardware gestion_hardware { get; set; }
     }
 }

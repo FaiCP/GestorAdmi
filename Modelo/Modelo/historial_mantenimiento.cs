@@ -15,10 +15,8 @@ namespace Modelo.Modelo
     public partial class historial_mantenimiento
     {
         public long id { get; set; }
-        public long id_equipo { get; set; }
+        public string id_equipo { get; set; }
         public Nullable<System.DateTime> fecha_mantenimiento { get; set; }
         public string detalles { get; set; }
-    
-        public virtual gestion_hardware gestion_hardware { get; set; }
     }
 }

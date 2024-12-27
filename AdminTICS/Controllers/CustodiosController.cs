@@ -1,0 +1,94 @@
+﻿using Comun.ViewModels;
+using Logica.BLL;
+using Modelo.Modelo;
+using Modelo.Modelos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Cors;
+
+
+namespace AdminTICS.Controllers
+{
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
+    [RoutePrefix("api/Custodios")]
+    public class CustodiosController : ApiController
+    {
+        [HttpGet]
+        [Route("LeerTodo")]
+        public IHttpActionResult LeerTodo(int cantidad , int pagina , string busqueda)
+        {
+            var respuesta = new RespuestasVMR<ListadoPaginadoVMR<CustodioVMR>>();
+
+            try
+            {
+                respuesta.datos = CustiodosBLL.LeerTodo(cantidad, pagina, busqueda);
+            }
+            catch (Exception ex)
+            {
+                respuesta.codigo = HttpStatusCode.InternalServerError;
+                respuesta.datos = null;
+                respuesta.mensajesErrors.Add(ex.Message);
+                respuesta.mensajesErrors.Add(ex.ToString());
+            }
+
+            return Content(respuesta.codigo, respuesta);
+        }
+
+        [HttpPost]
+        [Route("Crear")]
+        public IHttpActionResult Crear(Custodios item)
+        {
+            var respuesta = new RespuestasVMR<long?>();
+
+            try
+            {
+                var id = CustiodosBLL.Crear(item);
+                Console.WriteLine("Iniciando creación de Custodio...");
+                return Ok(new { id });
+            }
+            catch (Exception ex)
+            {
+                respuesta.codigo = HttpStatusCode.InternalServerError;
+                respuesta.datos = null;
+                respuesta.mensajesErrors.Add(ex.Message);
+                respuesta.mensajesErrors.Add(ex.ToString());
+            }
+
+            return Content(respuesta.codigo, respuesta);
+
+        }
+        [HttpGet]
+        [Route("GenerarActa")]
+        public HttpResponseMessage GenerarActa()
+        {
+            try
+            {
+                byte[] pdfBytes = CustiodosBLL.GenerarActaPDF();
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(pdfBytes)
+                };
+
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+                response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = $"Acta_Inventario_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent($"Error al generar el acta: {ex.Message}")
+                };
+            }
+        }
+
+    }
+}
