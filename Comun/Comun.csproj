@@ -52,8 +52,8 @@
     <Reference Include="MathNet.Numerics, Version=4.15.0.0, Culture=neutral, PublicKeyToken=cd8b63ad3d691a37, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.Signed.4.15.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=2.3.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.2.3.2\lib\net462\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.Core, Version=2.6.2.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
       <HintPath>..\packages\NPOI.2.6.2\lib\net472\NPOI.Core.dll</HintPath>
@@ -131,6 +131,9 @@
     <Compile Include="ViewModels\ListadoPaginadoVMR.cs" />
     <Compile Include="ViewModels\LoginVMR.cs" />
     <Compile Include="ViewModels\PersonalVMR.cs" />
+    <Compile Include="ViewModels\ReporteInventarioVMR.cs" />
+    <Compile Include="ViewModels\ReportePrestadosVMR.cs" />
+    <Compile Include="ViewModels\ReportePrestamosVMR.cs" />
     <Compile Include="ViewModels\RespuestasVMR.cs" />
     <Compile Include="ViewModels\SuministrosVMR.cs" />
   </ItemGroup>

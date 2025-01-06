@@ -50,6 +50,7 @@
     <Compile Include="BLL\KitsBLL.cs" />
     <Compile Include="BLL\LoginBLL.cs" />
     <Compile Include="BLL\PersonalBLL.cs" />
+    <Compile Include="BLL\ReportesBLL.cs" />
     <Compile Include="BLL\SuministrosBLL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
