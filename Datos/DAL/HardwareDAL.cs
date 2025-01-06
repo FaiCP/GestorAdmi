@@ -139,6 +139,7 @@ namespace Datos.DAL
                 itemUpdate.marca = item.marca;
                 itemUpdate.modelo = item.modelo;
                 itemUpdate.observacion = item.descripcion;
+                itemUpdate.nombre_dispositivo = item.nombre_dispositivo;
 
                 db.Entry(itemUpdate).State = System.Data.Entity.EntityState.Modified;
                 db.SaveChanges();
