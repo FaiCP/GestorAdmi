@@ -40,7 +40,7 @@ namespace Datos.DAL
 
                 // Procesar en memoria
                 var resultado = data
-                    .GroupBy(x => x.FechaAsignacion.Value.ToString("yyyy-MM")) // Formatear la fecha
+                    .GroupBy(x => x.FechaAsignacion.Value.ToString("MMMM", new System.Globalization.CultureInfo("es-ES"))) // Mes en letras en español
                     .Select(g => new ReportePrestamosVMR
                     {
                         Mes = g.Key,
@@ -60,20 +60,39 @@ namespace Datos.DAL
         {
             using (var db = DbConexion.Create())
             {
-                return db.gestion_hardware
+                // Obtener los datos de la base de datos
+                var resultados = db.gestion_hardware
                     .Join(
-                        db.gestion_activos.Where(a => (bool)!a.borrado && a.fecha_devolucion == null),
+                        db.gestion_activos.Where(a => a.fecha_devolucion == null),
                         h => h.id_equipo,
                         a => a.id_equipo,
-                        (h, a) => new { h.nombre_dispositivo }
+                        (h, a) => new { h.nombre_dispositivo, a.fecha_asignacion }
                     )
-                    .GroupBy(x => x.nombre_dispositivo)
-                    .Select(g => new ReportePrestadosVMR
+                    .GroupBy(x => new
                     {
-                        NombreDispositivo = g.Key,
-                        TotalPrestados = g.Count()
+                        x.nombre_dispositivo,
+                        Mes = x.fecha_asignacion.Value.Month,
+                        Año = x.fecha_asignacion.Value.Year
                     })
-                    .ToList();
+                    .Select(g => new
+                    {
+                        g.Key.nombre_dispositivo,
+                        TotalPrestados = g.Count(),
+                        Mes = g.Key.Mes,
+                        Año = g.Key.Año
+                    })
+                    .ToList(); // Ejecutar la consulta y traer los datos a memoria
+
+                // Convertir el número del mes a su representación textual
+                var reporteFinal = resultados.Select(r => new ReportePrestadosVMR
+                {
+                    NombreDispositivo = r.nombre_dispositivo,
+                    TotalPrestados = r.TotalPrestados,
+                    Mes = new DateTime(r.Año, r.Mes, 1).ToString("MMMM", new System.Globalization.CultureInfo("es-ES")),
+                    Año = r.Año
+                }).ToList();
+
+                return reporteFinal;
             }
         }
 
