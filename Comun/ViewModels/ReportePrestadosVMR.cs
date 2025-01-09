@@ -10,5 +10,7 @@ namespace Comun.ViewModels
     {
         public string NombreDispositivo { get; set; }
         public int TotalPrestados { get; set; }
+        public string Mes { get; set; }
+        public int Año { get; set; }
     }
 }
