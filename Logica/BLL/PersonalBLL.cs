@@ -28,5 +28,14 @@ namespace Logica.BLL
         {
             PersonalDAL.Eliminar(ids);
         }
+
+        public static byte[] DescargarPDF()
+        {
+            return PersonalDAL.DescargarPDF();
+        }
+        public static byte[] DescargarExcel()
+        {
+            return PersonalDAL.DescargarExcel();
+        }
     }
 }

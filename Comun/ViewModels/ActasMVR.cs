@@ -23,6 +23,6 @@ namespace Comun.ViewModels
         public string cargo2 { get; set; }
         public DateTime Fecha { get; set; }
         public Nullable<decimal> valor { get; set; }
-
+        public Nullable<System.DateTime> FechaDevolucion { get; set; }
     }
     }

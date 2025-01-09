@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OfficeOpenXml;
 
 namespace Datos.DAL
 {
@@ -76,26 +77,34 @@ namespace Datos.DAL
             return item.id;
         }
 
-        public static List<PersonalVMR> ObtenerPersonal(List<long> id_activo)
+        public static List<PersonalVMR> ObtenerPersonal(List<long> id_activo = null)
         {
             using (var db = DbConexion.Create())
             {
-                var equipos = (from p in db.Personal
-                               where !(bool)p.borrado && id_activo.Contains(p.id)
-                               select new PersonalVMR
-                               {
-                                   Id = p.id,
-                                   fecha = DateTime.Now,
-                                   nombre = p.nombre,
-                                   cedula = p.cedula,
-                                   cargo = p.cargo,
-                                   email = p.email,
-                                   tempPass = p.tempPass
-                               }).ToList();
+                // Consulta base
+                var query = from p in db.Personal
+                            where !(bool)p.borrado
+                            select new PersonalVMR
+                            {
+                                Id = p.id,
+                                fecha = DateTime.Now, // Puedes ajustar esto si necesitas otra fecha
+                                nombre = p.nombre,
+                                cedula = p.cedula,
+                                cargo = p.cargo,
+                                email = p.email,
+                                tempPass = p.tempPass
+                            };
 
-                return equipos;
+                // Si se proporciona una lista de IDs, filtra por estos
+                if (id_activo != null && id_activo.Any())
+                {
+                    query = query.Where(p => id_activo.Contains(p.Id));
+                }
+
+                return query.ToList();
             }
         }
+
 
 
         public static byte[] GenerarActaPDF(List<long> id_activo)
@@ -249,6 +258,195 @@ namespace Datos.DAL
                     db.Entry(item).State = System.Data.Entity.EntityState.Modified;
                 }
                 db.SaveChanges();
+            }
+        }
+
+        private static List<ReporteVMR> GenerarDatosReporte()
+        {
+            var fechaLimite = DateTime.Now.AddMonths(-6);
+
+            // Obtener todos los equipos
+            var equipos = ObtenerEquiposConCustodio(new List<long>()).Where(e => e.Fecha >= fechaLimite || (e.FechaDevolucion != null && e.FechaDevolucion >= fechaLimite)).ToList(); // Pasa una lista vacía o ajusta para traer todo
+
+            var sistemas = ObtenerPersonal(new List<long>()).Where(s => s.fecha >= fechaLimite).ToList(); // Pasa una lista vacía o ajusta para traer todo
+
+            var reporte = new List<ReporteVMR>();
+
+            // Equipos
+            foreach (var equipo in equipos)
+            {
+                reporte.Add(new ReporteVMR
+                {
+                    Fecha = equipo.Fecha,
+                    Entrega = "NELSON RICARDO CARDENAS HERMOZA-TECNICO ELECTORAL",
+                    Recibe = equipo.NombreCustodio1 ?? "",
+                    EquiposE = "X",
+                    Observacion = $"{equipo.nombre_dispositivo}, {equipo.Marca}, {equipo.Modelo}, {equipo.CodigoCNE}"
+                });
+
+                if (equipo.FechaDevolucion != null)
+                {
+                    reporte.Add(new ReporteVMR
+                    {
+                        Fecha = equipo.FechaDevolucion,
+                        Entrega = equipo.NombreCustodio1 ?? "",
+                        Recibe = "NELSON RICARDO CARDENAS HERMOZA-TECNICO ELECTORAL",
+                        EquiposE = "X",
+                        Observacion = $"{equipo.nombre_dispositivo}, {equipo.Marca}, {equipo.Modelo}, {equipo.CodigoCNE}"
+                    });
+                }
+            }
+
+            // Sistemas
+            foreach (var sistema in sistemas)
+            {
+                reporte.Add(new ReporteVMR
+                {
+                    Fecha = sistema.fecha,
+                    Entrega = "NELSON RICARDO CARDENAS HERMOZA-TECNICO ELECTORAL",
+                    Recibe = sistema.nombre,
+                    EquiposP = "X",
+                    Observacion = "Credenciales Zimbra y Quipux"
+                });
+            }
+
+            return reporte;
+        }
+
+
+        public static List<ActasMVR> ObtenerEquiposConCustodio(List<long> id_activo = null)
+        {
+            using (var db = DbConexion.Create())
+            {
+                var query = from ga in db.gestion_activos
+                            where !(bool)ga.borrado
+                            select new ActasMVR
+                            {
+                                Id = ga.id,
+                                id_equipo = ga.id_equipo,
+                                Fecha = (DateTime)ga.fecha_asignacion,
+                                FechaDevolucion = ga.fecha_devolucion,
+                                Descripcion = ga.gestion_hardware.observacion,
+                                nombre_dispositivo = ga.gestion_hardware.nombre_dispositivo,
+                                Marca = ga.gestion_hardware.marca,
+                                Modelo = ga.gestion_hardware.modelo,
+                                CodigoCNE = ga.gestion_hardware.codigo_cne,
+                                Estado = ga.gestion_hardware.estado,
+                                NombreCustodio1 = (from hc in db.Custodios
+                                                   where hc.id == ga.id_custodio
+                                                   select hc.nombre).FirstOrDefault()
+                            };
+
+                if (id_activo != null && id_activo.Any())
+                {
+                    query = query.Where(ga => id_activo.Contains(ga.Id));
+                }
+
+                return query.ToList();
+            }
+        }
+
+
+        public static byte[] DescargarPDF()
+        {
+            var equipos = ObtenerEquiposConCustodio(new List<long>()); // Llamar con lógica adecuada para obtener todos los equipos
+
+            var sistemas = ObtenerPersonal(new List<long>()); // Llamar con lógica adecuada para obtener todo el personal
+
+            // Generar reporte
+            var reporte = GenerarDatosReporte();
+
+            using (var stream = new MemoryStream())
+            {
+                Document pdfDoc = new Document(PageSize.A4, 25, 25, 30, 30);
+                PdfWriter writer = PdfWriter.GetInstance(pdfDoc, stream);
+                pdfDoc.Open();
+
+                // Título
+                pdfDoc.Add(new Paragraph("Informe de Gestión de Activos y Sistemas"));
+                pdfDoc.Add(new Paragraph($"Fecha: {DateTime.Now}\n\n"));
+
+                // Tabla
+                PdfPTable table = new PdfPTable(6)
+                {
+                    WidthPercentage = 100
+                };
+
+                // Encabezados
+                var headers = new[] { "Fecha", "Entrega", "Recibe", "Equipos","Sistemas", "Observación" };
+                foreach (var header in headers)
+                {
+                    table.AddCell(new PdfPCell(new Phrase(header)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                }
+
+                // Datos
+                foreach (var item in reporte)
+                {
+                    table.AddCell(item.Fecha?.ToString("yyyy-MM-dd") ?? string.Empty);
+                    table.AddCell(item.Entrega);
+                    table.AddCell(item.Recibe);
+                    table.AddCell(item.EquiposE);
+                    table.AddCell(item.EquiposP);
+                    table.AddCell(item.Observacion);
+                }
+
+                pdfDoc.Add(table);
+                pdfDoc.Close();
+
+                var fileBytes = stream.ToArray();
+                return stream.ToArray();
+            }
+        }
+
+        public static byte[] DescargarExcel()
+        {
+            var equipos = ObtenerEquiposConCustodio(new List<long>()); // Llamar con lógica adecuada para obtener todos los equipos
+            var sistemas = ObtenerPersonal(new List<long>()); // Llamar con lógica adecuada para obtener todo el personal
+
+            // Generar reporte
+            var reporte = GenerarDatosReporte();
+
+            using (var package = new ExcelPackage())
+            {
+                // Crear hoja de trabajo
+                var worksheet = package.Workbook.Worksheets.Add("Informe");
+
+                // Encabezados
+                worksheet.Cells[1, 1].Value = "Fecha";
+                worksheet.Cells[1, 2].Value = "Entrega";
+                worksheet.Cells[1, 3].Value = "Recibe";
+                worksheet.Cells[1, 4].Value = "Equipos";
+                worksheet.Cells[1, 5].Value = "Sistemas";
+                worksheet.Cells[1, 6].Value = "Observación";
+
+                // Formato de encabezados
+                using (var range = worksheet.Cells[1, 1, 1, 6])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                }
+
+                // Llenar datos
+                int fila = 2; // Comenzar en la segunda fila
+                foreach (var item in reporte)
+                {
+                    worksheet.Cells[fila, 1].Value = item.Fecha?.ToString("yyyy-MM-dd") ?? string.Empty;
+                    worksheet.Cells[fila, 2].Value = item.Entrega;
+                    worksheet.Cells[fila, 3].Value = item.Recibe;
+                    worksheet.Cells[fila, 4].Value = item.EquiposE;
+                    worksheet.Cells[fila, 5].Value = item.EquiposP;
+                    worksheet.Cells[fila, 6].Value = item.Observacion;
+
+                    fila++;
+                }
+
+                // Ajustar ancho de las columnas
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Retornar el archivo como byte array
+                return package.GetAsByteArray();
             }
         }
 

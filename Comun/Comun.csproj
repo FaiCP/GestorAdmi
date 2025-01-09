@@ -134,6 +134,7 @@
     <Compile Include="ViewModels\ReporteInventarioVMR.cs" />
     <Compile Include="ViewModels\ReportePrestadosVMR.cs" />
     <Compile Include="ViewModels\ReportePrestamosVMR.cs" />
+    <Compile Include="ViewModels\ReporteVMR.cs" />
     <Compile Include="ViewModels\RespuestasVMR.cs" />
     <Compile Include="ViewModels\SuministrosVMR.cs" />
   </ItemGroup>
