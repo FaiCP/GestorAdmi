@@ -76,12 +76,12 @@ namespace Datos.DAL
             return item.id;
         }
 
-        public static List<PersonalVMR> ObtenerPersonal()
+        public static List<PersonalVMR> ObtenerPersonal(List<long> id_activo)
         {
             using (var db = DbConexion.Create())
             {
                 var equipos = (from p in db.Personal
-                               where !(bool)p.borrado 
+                               where !(bool)p.borrado && id_activo.Contains(p.id)
                                select new PersonalVMR
                                {
                                    Id = p.id,
@@ -91,12 +91,12 @@ namespace Datos.DAL
                                    cargo = p.cargo,
                                    email = p.email,
                                    tempPass = p.tempPass
-                                  
                                }).ToList();
 
                 return equipos;
             }
         }
+
 
         public static byte[] GenerarActaPDF(List<long> id_activo)
         {
@@ -104,9 +104,9 @@ namespace Datos.DAL
             {
                 using (var stream = new MemoryStream())
                 {
-                    var equiposInfo = ObtenerPersonal();
+                    var equiposInfo = ObtenerPersonal(id_activo);
 
-                    Document document = new Document(PageSize.A4, 36, 36, 100, 100);
+                    Document document = new Document(PageSize.A4, 36, 36, 50, 50);
                     PdfWriter writer = PdfWriter.GetInstance(document, stream);
                     writer.PageEvent = new EncabezadoPersonalVMR();
                     document.Open();
@@ -120,7 +120,7 @@ namespace Datos.DAL
 
                     // Título del Acta
 
-                    Paragraph tituloActa = new Paragraph("ACTA ENTREGA RECEPCIÓN DE CREDENCIALES DIGITALES\n", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD))
+                    Paragraph tituloActa = new Paragraph("ACTA ENTREGA RECEPCIÓN DE CREDENCIALES DIGITALES", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD))
                     {
                         Alignment = Element.ALIGN_CENTER
                     };
@@ -132,7 +132,7 @@ namespace Datos.DAL
                     nombre.Add(new Chunk(equipoSeleccionado.nombre, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)));
                     nombre.Add(new Chunk(" con nùmero de cedula Nº", new Font(Font.FontFamily.HELVETICA, 12)));
                     nombre.Add(new Chunk (equipoSeleccionado.cedula, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)));
-                    nombre.Add(new Chunk($", cuyo cargo es {equipoSeleccionado.cedula} para el proceso Electoral {equipoSeleccionado.fecha:yyyy} El funcionario receptor de las credenciales está obligado al cumplimiento de:\n", new Font(Font.FontFamily.HELVETICA, 12)));
+                    nombre.Add(new Chunk($", cuyo cargo es {equipoSeleccionado.cargo} para el proceso Electoral {equipoSeleccionado.fecha:yyyy} El funcionario receptor de las credenciales está obligado al cumplimiento de:\n", new Font(Font.FontFamily.HELVETICA, 12)));
 
                     Paragraph parrafo = new Paragraph(nombre)
                     {
@@ -170,7 +170,7 @@ namespace Datos.DAL
 
                     document.Add(listaNumerada);
 
-                    Paragraph parrafo3 = new Paragraph($"Para la constancia de lo  actuado y en fe de conformidad y aceptación, se suscribe la presente acta en dos originales de  igual valor y efecto para las personas que  intervienen en esta diligencia, en  la ciudad de Puyo, a los {equipoSeleccionado.fecha:dddd} días del mes {equipoSeleccionado.fecha:MMMM} del {equipoSeleccionado.fecha:yyyy}\n", new Font(Font.FontFamily.HELVETICA, 12))
+                    Paragraph parrafo3 = new Paragraph($"Para la constancia de lo  actuado y en fe de conformidad y aceptación, se suscribe la presente acta en dos originales de  igual valor y efecto para las personas que  intervienen en esta diligencia, en  la ciudad de Puyo, a los {equipoSeleccionado.fecha:dd} días del mes {equipoSeleccionado.fecha:MMMM} del {equipoSeleccionado.fecha:yyyy}\n", new Font(Font.FontFamily.HELVETICA, 12))
                     {
                         Alignment = Element.ALIGN_JUSTIFIED
                     };
@@ -221,8 +221,8 @@ namespace Datos.DAL
                     table2.WidthPercentage = 100;
 
                     // Encabezados
-                    table2.AddCell("ING. NELSON RICARDO CARDENAS HERMOSA\n");
-                    table2.AddCell("Técnico Electoral 2\n");
+                    table2.AddCell("ING. NELSON RICARDO CARDENAS HERMOZA\n\n");
+                    table2.AddCell("Técnico Electoral 2\n\n");
                     table2.AddCell(" ");
                     document.Add(table2);
 

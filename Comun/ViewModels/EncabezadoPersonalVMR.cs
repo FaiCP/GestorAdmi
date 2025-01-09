@@ -63,9 +63,9 @@ namespace Comun.ViewModels
             // Ajustar el ancho total de la tabla para que ocupe el espacio completo de la página
             headerTable.TotalWidth = document.PageSize.Width - document.LeftMargin - document.RightMargin;
 
-            // Posicionar la tabla en el encabezado
-            float yPosition = document.PageSize.Height - 60; // Ajustar la posición vertical
-            headerTable.WriteSelectedRows(0, -50, document.LeftMargin, yPosition, writer.DirectContent);
+            // Escribir la tabla en la página (ajustar la posición)
+            float yPosition = document.PageSize.Height - 10;  // Ajusta la posición para que no se superponga
+            headerTable.WriteSelectedRows(0, -1, document.LeftMargin, yPosition, writer.DirectContent);
 
         }
 
@@ -86,12 +86,13 @@ namespace Comun.ViewModels
                 VerticalAlignment = Element.ALIGN_MIDDLE // Centrado vertical
             };
             footerTable.AddCell(footerTextCell);
+
             // Ajustar el ancho total de la tabla para que ocupe el espacio completo de la página
             footerTable.TotalWidth = document.PageSize.Width - document.LeftMargin - document.RightMargin;
 
             // Escribir el pie de página en la página (ajustar la posición)
-            float yPosition = document.Bottom - 60;  // Ajustar la posición para que la imagen no quede demasiado abajo
-            footerTable.WriteSelectedRows(0, +10, document.LeftMargin, yPosition, writer.DirectContent);
+            float yPosition = document.Bottom - 10;  // Ajustar la posición para que la imagen no quede demasiado abajo
+            footerTable.WriteSelectedRows(0, -1, document.LeftMargin, yPosition, writer.DirectContent);
         }
     }
 }
