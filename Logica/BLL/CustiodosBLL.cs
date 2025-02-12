@@ -19,6 +19,10 @@ namespace Logica.BLL
         {
             return CustodiosDAL.Crear(item);
         }
+        public static void Actualizar(CustodioVMR item)
+        {
+            CustodiosDAL.Actualizar(item);
+        }
 
         public static byte[] GenerarActaPDF()
         {

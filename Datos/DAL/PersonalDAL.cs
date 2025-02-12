@@ -3,6 +3,7 @@ using iTextSharp.text.pdf;
 using iTextSharp.text;
 using Modelo.Modelo;
 using Modelo.Modelos;
+using System.Net.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OfficeOpenXml;
+using System.Xml.Linq;
 
 namespace Datos.DAL
 {
@@ -77,6 +79,21 @@ namespace Datos.DAL
             return item.id;
         }
 
+        public static void Actualizar(PersonalVMR item)
+        {
+            using (var db = DbConexion.Create())
+            {
+                var itemUpdate = db.Personal.Find(item.Id);
+                itemUpdate.email = item.email;
+                itemUpdate.cedula = item.cedula;
+                itemUpdate.nombre = item.nombre;
+                itemUpdate.cargo = item.cargo;
+                itemUpdate.tempPass = item.tempPass;
+                db.Entry(itemUpdate).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
         public static List<PersonalVMR> ObtenerPersonal(List<long> id_activo = null)
         {
             using (var db = DbConexion.Create())
@@ -87,7 +104,7 @@ namespace Datos.DAL
                             select new PersonalVMR
                             {
                                 Id = p.id,
-                                fecha = DateTime.Now, // Puedes ajustar esto si necesitas otra fecha
+                                fecha = p.fecha,
                                 nombre = p.nombre,
                                 cedula = p.cedula,
                                 cargo = p.cargo,
@@ -115,7 +132,7 @@ namespace Datos.DAL
                 {
                     var equiposInfo = ObtenerPersonal(id_activo);
 
-                    Document document = new Document(PageSize.A4, 36, 36, 50, 50);
+                    Document document = new Document(PageSize.A4, 36, 36, 70, 50);
                     PdfWriter writer = PdfWriter.GetInstance(document, stream);
                     writer.PageEvent = new EncabezadoPersonalVMR();
                     document.Open();
@@ -264,11 +281,18 @@ namespace Datos.DAL
         private static List<ReporteVMR> GenerarDatosReporte()
         {
             var fechaLimite = DateTime.Now.AddMonths(-6);
+            var añoActual = DateTime.Now.Year;
 
             // Obtener todos los equipos
-            var equipos = ObtenerEquiposConCustodio(new List<long>()).Where(e => e.Fecha >= fechaLimite || (e.FechaDevolucion != null && e.FechaDevolucion >= fechaLimite)).ToList(); // Pasa una lista vacía o ajusta para traer todo
+            var equipos = ObtenerEquiposConCustodio(new List<long>())
+                .Where(e =>
+                    (e.Fecha >= fechaLimite && e.Fecha.Year == añoActual) ||
+                    (e.FechaDevolucion >= fechaLimite && e.FechaDevolucion.Value.Year == añoActual))
+                .ToList();
 
-            var sistemas = ObtenerPersonal(new List<long>()).Where(s => s.fecha >= fechaLimite).ToList(); // Pasa una lista vacía o ajusta para traer todo
+            var sistemas = ObtenerPersonal(new List<long>())
+                .Where(s => s.fecha >= fechaLimite && s.fecha.Value.Year == añoActual)
+                .ToList();
 
             var reporte = new List<ReporteVMR>();
 
@@ -281,7 +305,7 @@ namespace Datos.DAL
                     Entrega = "NELSON RICARDO CARDENAS HERMOZA-TECNICO ELECTORAL",
                     Recibe = equipo.NombreCustodio1 ?? "",
                     EquiposE = "X",
-                    Observacion = $"{equipo.nombre_dispositivo}, {equipo.Marca}, {equipo.Modelo}, {equipo.CodigoCNE}"
+                    Observacion = $"{equipo.nombre_dispositivo}, Marca:{equipo.Marca}, Modelo:{equipo.Modelo}, Serie:{equipo.CodigoCNE}"
                 });
 
                 if (equipo.FechaDevolucion != null)
@@ -292,7 +316,7 @@ namespace Datos.DAL
                         Entrega = equipo.NombreCustodio1 ?? "",
                         Recibe = "NELSON RICARDO CARDENAS HERMOZA-TECNICO ELECTORAL",
                         EquiposE = "X",
-                        Observacion = $"{equipo.nombre_dispositivo}, {equipo.Marca}, {equipo.Modelo}, {equipo.CodigoCNE}"
+                        Observacion = $"{equipo.nombre_dispositivo}, Marca:{equipo.Marca}, Modelo:{equipo.Modelo}, Serie:{equipo.CodigoCNE}"
                     });
                 }
             }
@@ -312,6 +336,8 @@ namespace Datos.DAL
 
             return reporte;
         }
+
+
 
 
         public static List<ActasMVR> ObtenerEquiposConCustodio(List<long> id_activo = null)
@@ -347,59 +373,213 @@ namespace Datos.DAL
         }
 
 
-        public static byte[] DescargarPDF()
+        public static async Task<byte[]> DescargarPDF()
         {
-            var equipos = ObtenerEquiposConCustodio(new List<long>()); // Llamar con lógica adecuada para obtener todos los equipos
-
-            var sistemas = ObtenerPersonal(new List<long>()); // Llamar con lógica adecuada para obtener todo el personal
-
-            // Generar reporte
-            var reporte = GenerarDatosReporte();
-
-            using (var stream = new MemoryStream())
+            try
             {
-                Document pdfDoc = new Document(PageSize.A4, 25, 25, 30, 30);
-                PdfWriter writer = PdfWriter.GetInstance(pdfDoc, stream);
-                pdfDoc.Open();
+                var reporte = GenerarDatosReporte(); // Generar datos del reporte
 
-                // Título
-                pdfDoc.Add(new Paragraph("Informe de Gestión de Activos y Sistemas"));
-                pdfDoc.Add(new Paragraph($"Fecha: {DateTime.Now}\n\n"));
-
-                // Tabla
-                PdfPTable table = new PdfPTable(6)
+                using (var stream = new MemoryStream())
                 {
-                    WidthPercentage = 100
-                };
+                    Document pdfDoc = new Document(PageSize.A4, 25, 25, 30, 30);
+                    PdfWriter writer = PdfWriter.GetInstance(pdfDoc, stream);
+                    pdfDoc.Open();
 
-                // Encabezados
-                var headers = new[] { "Fecha", "Entrega", "Recibe", "Equipos","Sistemas", "Observación" };
-                foreach (var header in headers)
-                {
-                    table.AddCell(new PdfPCell(new Phrase(header)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    // Descargar el logo desde el enlace
+                    string logoUrl = "https://i.postimg.cc/BQM89b61/logo2.png";
+                    Image logo = null;
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.GetAsync(logoUrl);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var logoBytes = await response.Content.ReadAsByteArrayAsync();
+                            using (var logoStream = new MemoryStream(logoBytes))
+                            {
+                                logo = Image.GetInstance(logoStream);
+                                logo.ScaleToFit(80, 80); // Ajusta el tamaño del logo
+                            }
+                        }
+                    }
+
+                    // Crear tabla principal para el encabezado
+                    PdfPTable mainHeaderTable = new PdfPTable(2)
+                    {
+                        WidthPercentage = 100
+                    };
+                    mainHeaderTable.SetWidths(new float[] { 1, 3 }); // Configuración de anchos relativos
+
+                    // Subtabla para el logo
+                    PdfPTable logoTable = new PdfPTable(1);
+                    logoTable.WidthPercentage = 100;
+
+                    if (logo != null)
+                    {
+                        PdfPCell logoCell = new PdfPCell(logo)
+                        {
+                            
+                            HorizontalAlignment = Element.ALIGN_CENTER,
+                            VerticalAlignment = Element.ALIGN_MIDDLE,
+                            Padding = 5
+                        };
+                        logoTable.AddCell(logoCell);
+                    }
+                    else
+                    {
+                        // Espacio vacío si no hay logo
+                        logoTable.AddCell(new PdfPCell { Border = PdfPCell.NO_BORDER });
+                    }
+
+                    // Agregar la subtabla del logo a la tabla principal
+                    PdfPCell logoTableCell = new PdfPCell(logoTable)
+                    {
+                        Border = PdfPCell.NO_BORDER
+                    };
+                    mainHeaderTable.AddCell(logoTableCell);
+
+                    // Subtabla para los textos
+                    PdfPTable textTable = new PdfPTable(1);
+                    textTable.WidthPercentage = 100;
+
+                    // Primera línea de texto
+                    PdfPCell firstTextCell = new PdfPCell(new Phrase("Reporte de entrega y recepción de equipos informáticos y sistemas electorales para usuarios finales en el ámbito provincial", new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)))
+                    {
+                        
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        Padding = 5
+                    };
+                    textTable.AddCell(firstTextCell);
+
+                    // Segunda línea de texto (dinámico)
+                    DateTime fechaReferencia = DateTime.Now;
+                    DateTime primerMes = new DateTime(fechaReferencia.Year, 1, 1);
+                    DateTime segundoMes = primerMes.AddMonths(5);
+                    string rangoMeses = $"{primerMes.ToString("MMMM", new System.Globalization.CultureInfo("es-ES"))} - {segundoMes.ToString("MMMM", new System.Globalization.CultureInfo("es-ES"))} {fechaReferencia.Year}";
+
+                    PdfPCell secondTextCell = new PdfPCell(new Phrase($"REGISTRO DE ACTAS ENTREGA RECEPCIÓN\n{rangoMeses}", new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)))
+                    {
+                        
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        Padding = 5
+                    };
+                    textTable.AddCell(secondTextCell);
+
+                    // Agregar la subtabla de texto a la tabla principal
+                    PdfPCell textTableCell = new PdfPCell(textTable)
+                    {
+                        Border = PdfPCell.NO_BORDER
+                    };
+                    mainHeaderTable.AddCell(textTableCell);
+
+                    // Agregar la tabla principal al documento
+                    pdfDoc.Add(mainHeaderTable);
+
+                    // Tabla para el contenido
+                    PdfPTable table = new PdfPTable(6)
+                    {
+                        WidthPercentage = 100
+                    };
+                    table.SetWidths(new float[] { 1.2f, 3f, 3f, 0.9f, 0.98f, 2f});
+
+                    var headers = new[] { "Fecha", "Entrega", "Recibe", "Equipos", "Sistemas", "Observación" };
+                    foreach (var header in headers)
+                    {
+                        table.AddCell(new PdfPCell(new Phrase(header, new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)))
+                        {
+                            BackgroundColor = BaseColor.LIGHT_GRAY,
+                            HorizontalAlignment = Element.ALIGN_CENTER
+                        });
+                    }
+
+                    string calibriFontPath = "D:\\calibrib.ttf";
+                    BaseFont calibriBaseFont = BaseFont.CreateFont(calibriFontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                    Font smallFont = new Font(calibriBaseFont, 11, Font.NORMAL);
+
+                    foreach (var item in reporte)
+                    {
+                        table.AddCell(new PdfPCell(new Phrase(item.Fecha?.ToString("yyyy-MM-dd") ?? string.Empty, smallFont)));
+                        table.AddCell(new PdfPCell(new Phrase(item.Entrega, smallFont)));
+                        table.AddCell(new PdfPCell(new Phrase(item.Recibe, smallFont)));
+                        table.AddCell(new PdfPCell(new Phrase(item.EquiposE, smallFont))
+                        {
+                            HorizontalAlignment = Element.ALIGN_CENTER // Centramos el contenido
+                        });
+                        table.AddCell(new PdfPCell(new Phrase(item.EquiposP, smallFont))
+                        {
+                            HorizontalAlignment = Element.ALIGN_CENTER // Centramos el contenido
+                        });
+                        table.AddCell(new PdfPCell(new Phrase(item.Observacion, smallFont)));
+                    }
+
+
+
+                    pdfDoc.Add(table);
+
+                    // Tabla final para "ELABORADO POR"
+                    PdfPTable elaboradoTable = new PdfPTable(2)
+                    {
+                        WidthPercentage = 100 // Ocupa el 100% del ancho de la página
+                    };
+                    elaboradoTable.SetWidths(new float[] { 2, 1 }); // Configuración de anchos relativos (más ancho para la izquierda)
+
+                    // Celda izquierda con el contenido
+                    PdfPCell elaboradoCell = new PdfPCell
+                    {
+                        Border = PdfPCell.BOX, // Bordes habilitados
+                        HorizontalAlignment = Element.ALIGN_CENTER, // Centrar horizontalmente
+                        VerticalAlignment = Element.ALIGN_CENTER,   // Centrar verticalmente
+                        Padding = 10 // Opcional: agregar algo de espacio interno
+                    };
+
+                    // Contenido del texto centrado
+                    var contenidoCentrado = new Paragraph
+                    {
+                        Alignment = Element.ALIGN_CENTER // Asegura que todo el texto dentro del párrafo esté centrado
+                    };
+                    contenidoCentrado.Add(new Chunk("ELABORADO POR:\n", new Font(calibriBaseFont, 12, Font.BOLD)));
+                    contenidoCentrado.Add(new Chunk("ING. RICARDO CARDENAS H.\n", new Font(calibriBaseFont, 12)));
+                    contenidoCentrado.Add(new Chunk("TECNICO ELECTORAL 2\n", new Font(calibriBaseFont, 12)));
+                    contenidoCentrado.Add(new Chunk("Unidad Provincial de Seguridad Informática y Proyectos Tecnológicos Electorales\n", new Font(calibriBaseFont, 12)));
+                    contenidoCentrado.Add(new Chunk("de Tungurahua", new Font(calibriBaseFont, 12)));
+
+                    // Agregar el contenido centrado a la celda
+                    elaboradoCell.AddElement(contenidoCentrado);
+
+                    // Agregar la celda izquierda a la tabla
+                    elaboradoTable.AddCell(elaboradoCell);
+
+                    // Celda derecha vacía con bordes
+                    PdfPCell emptyCell = new PdfPCell(new Phrase(" "))
+                    {
+                        Border = PdfPCell.BOX, // Bordes habilitados
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        Padding = 10
+                    };
+                    elaboradoTable.AddCell(emptyCell);
+
+                    // Agregar la tabla final al documento
+                    pdfDoc.Add(elaboradoTable);
+
+                    pdfDoc.Close();
+
+                    return stream.ToArray();
                 }
-
-                // Datos
-                foreach (var item in reporte)
-                {
-                    table.AddCell(item.Fecha?.ToString("yyyy-MM-dd") ?? string.Empty);
-                    table.AddCell(item.Entrega);
-                    table.AddCell(item.Recibe);
-                    table.AddCell(item.EquiposE);
-                    table.AddCell(item.EquiposP);
-                    table.AddCell(item.Observacion);
-                }
-
-                pdfDoc.Add(table);
-                pdfDoc.Close();
-
-                var fileBytes = stream.ToArray();
-                return stream.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al generar el PDF", ex);
             }
         }
 
+
+
+
         public static byte[] DescargarExcel()
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var equipos = ObtenerEquiposConCustodio(new List<long>()); // Llamar con lógica adecuada para obtener todos los equipos
             var sistemas = ObtenerPersonal(new List<long>()); // Llamar con lógica adecuada para obtener todo el personal
 

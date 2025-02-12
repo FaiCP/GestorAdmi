@@ -10,6 +10,7 @@ namespace Comun.ViewModels
     {
         public long id { get; set; } 
         public string departamento { get; set; }
+        public Nullable<long> departamentos { get; set; }
         public string cedula_empleado { get; set; }
         public string cargo_empleado { get; set; }
         public string nombre_empleado { get; set; }

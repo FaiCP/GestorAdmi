@@ -29,10 +29,15 @@ namespace Logica.BLL
             PersonalDAL.Eliminar(ids);
         }
 
-        public static byte[] DescargarPDF()
+        public static async Task<byte[]> DescargarPDF()
         {
-            return PersonalDAL.DescargarPDF();
+            return await PersonalDAL.DescargarPDF();
         }
+        public static void Actualizar(PersonalVMR item)
+        {
+            PersonalDAL.Actualizar(item);
+        }
+
         public static byte[] DescargarExcel()
         {
             return PersonalDAL.DescargarExcel();

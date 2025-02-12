@@ -24,5 +24,9 @@ namespace Comun.ViewModels
         public string NombreCustodio { get; set; }
         public string Departamento { get; set; }
         public string NombreCustodio1 { get; set; }
+        public string ram { get; set; }
+        public string rom { get; set; }
+        public string Procesador { get; set; }
+
     }
 }

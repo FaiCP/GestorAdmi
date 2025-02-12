@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -72,34 +73,38 @@ namespace AdminTICS.Controllers
 
         [HttpGet]
         [Route("GenerarReporte")]
-        public HttpResponseMessage DescargarPDF()
+        public async Task<HttpResponseMessage> DescargarPDF()
         {
             try
             {
-                
-                byte[] pdfBytes = PersonalBLL.DescargarPDF();
+                // Generar el PDF
+                var pdfBytes = await PersonalBLL.DescargarPDF();
+
+                // Crear la respuesta HTTP
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new ByteArrayContent(pdfBytes)
                 };
 
+                // Configurar los encabezados de contenido
                 response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
                 response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
                 {
-                    FileName = $"actas ER {DateTime.Now:yyyyMMddHHmmss}.pdf"
+                    FileName = $"actas_ER_{DateTime.Now:yyyyMMddHHmmss}.pdf"
                 };
 
                 return response;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
-                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                // Retornar error en caso de excepción
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
-                    Content = new StringContent($"Error al generar el acta: {ex.Message}")
+                    Content = new StringContent($"Error al generar el PDF: {ex.Message}")
                 };
             }
         }
+
 
         [HttpGet]
         [Route("GenerarReporteExel")]
@@ -153,6 +158,29 @@ namespace AdminTICS.Controllers
 
             return Content(respuesta.codigo, respuesta);
 
+        }
+
+        [HttpPut]
+        [Route("Actualizar/{id}")]
+        public IHttpActionResult Actualizar(long id, PersonalVMR item)
+        {
+            var respuesta = new RespuestasVMR<bool>();
+
+            try
+            {
+                item.Id = id;
+                PersonalBLL.Actualizar(item);
+                respuesta.datos = true;
+            }
+            catch (Exception ex)
+            {
+                respuesta.codigo = HttpStatusCode.InternalServerError;
+                respuesta.datos = false;
+                respuesta.mensajesErrors.Add(ex.Message);
+                respuesta.mensajesErrors.Add(ex.ToString());
+            }
+
+            return Content(respuesta.codigo, respuesta);
         }
 
         [HttpDelete]

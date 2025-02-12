@@ -61,6 +61,30 @@ namespace AdminTICS.Controllers
             return Content(respuesta.codigo, respuesta);
 
         }
+
+        [HttpPut]
+        [Route("Actualizar/{id}")]
+        public IHttpActionResult Actualizar(long id, CustodioVMR item)
+        {
+            var respuesta = new RespuestasVMR<bool>();
+
+            try
+            {
+                item.id = id;
+                CustiodosBLL.Actualizar(item);
+                respuesta.datos = true;
+            }
+            catch (Exception ex)
+            {
+                respuesta.codigo = HttpStatusCode.InternalServerError;
+                respuesta.datos = false;
+                respuesta.mensajesErrors.Add(ex.Message);
+                respuesta.mensajesErrors.Add(ex.ToString());
+            }
+
+            return Content(respuesta.codigo, respuesta);
+        }
+
         [HttpGet]
         [Route("GenerarActa")]
         public HttpResponseMessage GenerarActa()
