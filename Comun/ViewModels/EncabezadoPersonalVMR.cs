@@ -15,12 +15,25 @@ namespace Comun.ViewModels
         // Método para cargar imagen de forma síncrona desde una URL
         private Image LoadImage(string imageUrl)
         {
-            using (var client = new WebClient())
+            try
             {
-                var imageBytes = client.DownloadData(imageUrl);
-                return Image.GetInstance(imageBytes);
+                using (var client = new WebClient())
+                {
+                    var imageBytes = client.DownloadData(imageUrl);
+                    return Image.GetInstance(imageBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Manejo de error: devuelve un marcador en lugar de interrumpir la generación del PDF
+                Console.WriteLine($"Error al descargar la imagen desde {imageUrl}: {ex.Message}");
+                // Devuelve un espacio vacío para que el diseño se mantenga
+                var placeholder = Image.GetInstance(new byte[0]);
+                placeholder.ScaleToFit(60, 60); // Ajusta el tamaño del espacio vacío
+                return placeholder;
             }
         }
+
 
         public override void OnStartPage(PdfWriter writer, Document document)
         {
@@ -40,7 +53,8 @@ namespace Comun.ViewModels
             {
                 
                 HorizontalAlignment = Element.ALIGN_CENTER,
-                VerticalAlignment = Element.ALIGN_MIDDLE
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                Border = PdfPCell.NO_BORDER
             };
             headerTable.AddCell(logoCell);
 

@@ -16,10 +16,21 @@ namespace Comun.ViewModels
         // Método para cargar imagen de forma síncrona desde una URL
         private Image LoadImage(string imageUrl)
         {
-            using (var client = new WebClient())
+            try
             {
-                var imageBytes = client.DownloadData(imageUrl);
-                return Image.GetInstance(imageBytes);
+                using (var client = new WebClient())
+                {
+                    var imageBytes = client.DownloadData(imageUrl);
+                    return Image.GetInstance(imageBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Manejo de error: devuelve una imagen vacía o un texto con la URL
+                Console.WriteLine($"Error al descargar la imagen desde {imageUrl}: {ex.Message}");
+                var phrase = new Phrase(imageUrl, FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.RED));
+                var paragraph = new Paragraph(phrase);
+                return Image.GetInstance(new byte[0]); // Devuelve una imagen vacía
             }
         }
 

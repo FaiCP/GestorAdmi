@@ -74,6 +74,29 @@ namespace Datos.DAL
 
         }
 
+        public static void Actualizar(CustodioVMR item)
+        {
+            using (var db = DbConexion.Create())
+            {
+                string idDepartamentoString = item.departamento;
+                long idDepartamentoLong;
+                var itemUpdate = db.Custodios.Find(item.id);
+                itemUpdate.nombre = item.nombre_empleado;
+                itemUpdate.cedula = item.cedula_empleado;
+                itemUpdate.cargo = item.cargo_empleado;
+                if (long.TryParse(idDepartamentoString, out idDepartamentoLong))
+                {
+                    itemUpdate.id_departamento = idDepartamentoLong;
+                }
+                else
+                {
+                    throw new ArgumentException($"El valor '{idDepartamentoString}' no es un número válido para id_departamento.");
+                }
+                db.Entry(itemUpdate).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
         public static List<ActasMVR> ObtenerReporteGeneral()
         {
             using (var db = DbConexion.Create())

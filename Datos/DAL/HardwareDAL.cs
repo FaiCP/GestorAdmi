@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Data.Entity;
 
 namespace Datos.DAL
 {
@@ -178,6 +179,15 @@ namespace Datos.DAL
                                    codigo_cne = gh.codigo_cne,
                                    estado = gh.estado,
                                    valor = gh.valor,
+                                   ram = (from ca in db.caracteristicas_computadora
+                                          where ca.id_equipo == gh.id_equipo
+                                          select ca.ram).FirstOrDefault(),
+                                   rom = (from ca in db.caracteristicas_computadora
+                                          where ca.id_equipo == gh.id_equipo
+                                          select ca.rom).FirstOrDefault(),
+                                   Procesador = (from ca in db.caracteristicas_computadora
+                                          where ca.id_equipo == gh.id_equipo
+                                          select ca.procesador).FirstOrDefault(),
                                    NombreCustodio1 = (from ga in db.gestion_activos
                                                       join c in db.Custodios on ga.id_custodio equals c.id
                                                       where ga.id_equipo == gh.id_equipo
@@ -222,9 +232,9 @@ namespace Datos.DAL
                     Font font = new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL);
 
                     // Tabla de Detalle del Equipo
-                    PdfPTable table = new PdfPTable(9);
+                    PdfPTable table = new PdfPTable(12);
                     table.WidthPercentage = 100;
-                    table.SetWidths(new float[] { 0.5f, 1.4f, 2, 2, 1.5f, 2, 2, 1, 1.4f });
+                    table.SetWidths(new float[] { 0.5f, 1.4f, 2, 2, 1.5f, 2, 2,1 ,1 ,1 , 1, 1.4f });
 
                     // Encabezados (aplicar fuente a los encabezados)
                     table.AddCell(new PdfPCell(new Phrase("Nº", font)));
@@ -234,6 +244,9 @@ namespace Datos.DAL
                     table.AddCell(new PdfPCell(new Phrase("MARCA", font)));
                     table.AddCell(new PdfPCell(new Phrase("MODELO", font)));
                     table.AddCell(new PdfPCell(new Phrase("SERIE", font)));
+                    table.AddCell(new PdfPCell(new Phrase("RAM", font)));
+                    table.AddCell(new PdfPCell(new Phrase("DISCO DURO", font)));
+                    table.AddCell(new PdfPCell(new Phrase("PROCESADOR", font)));
                     table.AddCell(new PdfPCell(new Phrase("VALOR", font)));
                     table.AddCell(new PdfPCell(new Phrase("ESTADO", font)));
 
@@ -248,6 +261,9 @@ namespace Datos.DAL
                         table.AddCell(new PdfPCell(new Phrase(equipo.marca, font)));
                         table.AddCell(new PdfPCell(new Phrase(equipo.modelo, font)));
                         table.AddCell(new PdfPCell(new Phrase(equipo.codigo_cne, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.ram, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.rom, font)));
+                        table.AddCell(new PdfPCell(new Phrase(equipo.Procesador, font)));
                         table.AddCell(new PdfPCell(new Phrase(equipo.valor.ToString(), font)));
                         table.AddCell(new PdfPCell(new Phrase(equipo.estado, font)));
                         contador++;
@@ -293,10 +309,10 @@ namespace Datos.DAL
                         worksheet.Cells[1, 1].Style.Font.Size = 16;
                         worksheet.Cells[1, 1].Style.Font.Bold = true;
                         worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                        worksheet.Cells[1, 1, 1, 9].Merge = true; // Merge title across columns
+                        worksheet.Cells[1, 1, 1, 12].Merge = true; // Merge title across columns
 
                         // Encabezados de la tabla
-                        string[] headers = { "Nº", "ACTIVO", "CUSTODIO", "DESCRIPCION", "MARCA", "MODELO", "SERIE", "VALOR", "ESTADO" };
+                        string[] headers = { "Nº", "ACTIVO", "CUSTODIO", "DESCRIPCION", "MARCA", "MODELO", "SERIE", "RAM","DISCO DURO", "PROCESADOR", "VALOR", "ESTADO" };
                         for (int i = 0; i < headers.Length; i++)
                         {
                             worksheet.Cells[3, i + 1].Value = headers[i];
@@ -316,6 +332,9 @@ namespace Datos.DAL
                             worksheet.Cells[row, 5].Value = equipo.marca;
                             worksheet.Cells[row, 6].Value = equipo.modelo;
                             worksheet.Cells[row, 7].Value = equipo.codigo_cne;
+                            worksheet.Cells[row, 7].Value = equipo.ram;
+                            worksheet.Cells[row, 7].Value = equipo.rom;
+                            worksheet.Cells[row, 7].Value = equipo.Procesador;
                             worksheet.Cells[row, 8].Value = equipo.valor;
                             worksheet.Cells[row, 9].Value = equipo.estado;
                             row++;

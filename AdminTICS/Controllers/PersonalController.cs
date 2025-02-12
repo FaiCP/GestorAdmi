@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -70,7 +71,72 @@ namespace AdminTICS.Controllers
         }
 
 
+        [HttpGet]
+        [Route("GenerarReporte")]
+        public async Task<HttpResponseMessage> DescargarPDF()
+        {
+            try
+            {
+                // Generar el PDF
+                var pdfBytes = await PersonalBLL.DescargarPDF();
 
+                // Crear la respuesta HTTP
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(pdfBytes)
+                };
+
+                // Configurar los encabezados de contenido
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+                response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = $"actas_ER_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                // Retornar error en caso de excepción
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent($"Error al generar el PDF: {ex.Message}")
+                };
+            }
+        }
+
+
+        [HttpGet]
+        [Route("GenerarReporteExel")]
+        public HttpResponseMessage GenerarReporteExcel()
+        {
+            try
+            {
+                byte[] excelBytes = PersonalBLL.DescargarExcel(); // Asegúrate de que este método genere un archivo Excel
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(excelBytes)
+                };
+
+                // Cambiar el tipo de contenido a Excel
+                response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+                // Cambiar la extensión del archivo a .xlsx
+                response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = $"Reporte_actas{DateTime.Now:yyyyMMdd}.xlsx"
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent($"Error al generar el acta: {ex.Message}")
+                };
+            }
+        }
 
         [HttpPost]
         [Route("Crear")]
@@ -92,6 +158,29 @@ namespace AdminTICS.Controllers
 
             return Content(respuesta.codigo, respuesta);
 
+        }
+
+        [HttpPut]
+        [Route("Actualizar/{id}")]
+        public IHttpActionResult Actualizar(long id, PersonalVMR item)
+        {
+            var respuesta = new RespuestasVMR<bool>();
+
+            try
+            {
+                item.Id = id;
+                PersonalBLL.Actualizar(item);
+                respuesta.datos = true;
+            }
+            catch (Exception ex)
+            {
+                respuesta.codigo = HttpStatusCode.InternalServerError;
+                respuesta.datos = false;
+                respuesta.mensajesErrors.Add(ex.Message);
+                respuesta.mensajesErrors.Add(ex.ToString());
+            }
+
+            return Content(respuesta.codigo, respuesta);
         }
 
         [HttpDelete]

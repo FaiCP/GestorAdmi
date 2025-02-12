@@ -106,6 +106,7 @@ namespace Datos.DAL
             {
                 var itemUpdate = db.gestion_activos.Find(item.id);
 
+                
                 itemUpdate.fecha_devolucion = item.fecha_devolucion;
                 itemUpdate.borrado = true;
                 db.Entry(itemUpdate).State = System.Data.Entity.EntityState.Modified;
